@@ -23,13 +23,12 @@
                 <router-link class="nav-link" to="/matakuliah">Data Matakuliah</router-link>
               </li>
               <li class="nav-item dropdown">
-                <router-link to="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Data KRS </router-link>
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Data KRS </a>
                 <ul class="dropdown-menu dropdown-menu-dark">
-                  <li><router-link to="/krs" class="dropdown-item">KRS</router-link></li>
-                  <li><router-link to="/detilkrs" class="dropdown-item">Detail KRS</router-link></li>
+                  <li><router-link class="nav-link" to="/krs">KRS</router-link></li>
+                  <li><router-link class="nav-link" to="/detilkrs">Detil KRS</router-link></li>
                 </ul>
               </li>
-
               <li class="d-flex justify-content-between my-3" style="text-align: left">
                 <button type="button" class="btn btn-outline-danger" style="background-color: red; color: white" @click="logoutUser">Logout</button>
               </li>
@@ -64,7 +63,7 @@
             <td>{{ Mahasiswa.nim }}</td>
             <td>{{ Mahasiswa.nama }}</td>
             <td>
-              <router-link :to="{ name: 'MatkulMhs', params: { id: KrsId } }" class="btn btn-info">Detail Matkuliah Mahasiswa</router-link>
+              <router-link :to="{ name: 'MatkulMhs', params: { id: Mahasiswa.id, krsid: this.KrsId } }" class="btn btn-info">Detail Matakuliah Mahasiswa</router-link>
             </td>
           </tr>
         </tbody>

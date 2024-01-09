@@ -34,8 +34,8 @@
                     </div>
 
                     <div class="btn-group">
-                        <button type="submit" class="btn btn-primary ">Tambah Data</button>
-                        <router-link class="btn btn-danger" to="/krs">Kembali</router-link>
+                        <button type="submit" class="btn btn-primary">Tambah Data</button>
+                        <router-link class="btn btn-danger" to="/detilkrs">Kembali</router-link>
                     </div>
                 </form>
             </div>
@@ -49,7 +49,7 @@
   export default {
     data() {
       return {
-        KrsId: '',
+        KrsId: this.$route.params.id,
         detilKrs: {
           'krs_id': '',
           'matakuliah_id': '',
@@ -65,7 +65,6 @@
       this.loadMatakuliahList();
       this.loadMahasiswaList();
       this.loadKrsList();
-      this.KrsId = this.$route.params.id;
     },
     methods: {
       loadMatakuliahList() {
@@ -87,7 +86,6 @@
         });
       },
       addDetilKrs() {
-        this.detilKrs.krs_id = this.KrsId;
         console.log('Data to be submitted:', this.detilKrs);
         var url = 'https://api-group7-prognet.manpits.xyz/api/detilkrs';
         axios.post(url, this.detilKrs).then(() => {

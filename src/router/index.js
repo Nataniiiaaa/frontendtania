@@ -74,6 +74,11 @@ const routes = [
     component: () => import('../components/TambahKrs.vue'),
   },
   {
+    path: '/tambahdetilkrs',
+    name: 'TambahDetilKrs',
+    component: () => import('../components/TambahDetilKrs.vue'),
+  },
+  {
     path: '/tambahdetilkrs/:id',
     name: 'AddDetilKrs',
     component: () => import('../components/AddDetilKrs.vue'),
@@ -89,9 +94,14 @@ const routes = [
     component: () => import('../components/Semester.vue'),
   },
   {
-    path: '/detailmatakuliah-mahasiswa/:id',
+    path: '/detailmatakuliah-mahasiswa/:krsid/:id',
     name: 'MatkulMhs',
     component: () => import('../components/MatkulMhs.vue'),
+  },
+  {
+    path: '/show-mahasiswa-khs/:mhsid/:id',
+    name: 'ShowKhs',
+    component: () => import('../components/ShowKhs.vue'),
   },
 ];
 

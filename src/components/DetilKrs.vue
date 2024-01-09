@@ -1,6 +1,6 @@
 <template>
   <div>
-    <nav class="navbar navbar-dark bg-dark fixed-top">
+    <nav class="navbar navbar-dark bg-dark">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">DETIL KRS</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar" aria-label="Toggle navigation">
@@ -23,13 +23,12 @@
                 <router-link class="nav-link" to="/matakuliah">Data Matakuliah</router-link>
               </li>
               <li class="nav-item dropdown">
-                <router-link to="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Data KRS </router-link>
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Data KRS </a>
                 <ul class="dropdown-menu dropdown-menu-dark">
-                  <li><router-link to="/krs" class="dropdown-item">KRS</router-link></li>
-                  <li><router-link to="/detilkrs" class="dropdown-item">Detail KRS</router-link></li>
+                  <li><router-link class="nav-link" to="/krs">KRS</router-link></li>
+                  <li><router-link class="nav-link" to="/detilkrs">Detil KRS</router-link></li>
                 </ul>
               </li>
-
               <li class="d-flex justify-content-between my-3" style="text-align: left">
                 <button type="button" class="btn btn-outline-danger" style="background-color: red; color: white" @click="logoutUser">Logout</button>
               </li>
@@ -38,8 +37,8 @@
         </div>
       </div>
     </nav>
-    <div class="container" style="padding-top: 70px; height: 100vh; overflow-y: auto">
-      <div class="d-flex justify-content-between my-3">
+    <div class="container">
+      <div class="d-flex justify-content-between my-3 overflow-y: auto">
         <h2>DATA DETIL KRS</h2>
         <router-link class="btn btn-primary" to="/tambahdetilkrs">Tambah Data</router-link>
       </div>

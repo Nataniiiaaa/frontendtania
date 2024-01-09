@@ -23,13 +23,12 @@
                 <router-link class="nav-link" to="/matakuliah">Data Matakuliah</router-link>
               </li>
               <li class="nav-item dropdown">
-                <router-link to="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Data KRS </router-link>
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Data KRS </a>
                 <ul class="dropdown-menu dropdown-menu-dark">
-                  <li><router-link to="/krs" class="dropdown-item">KRS</router-link></li>
-                  <li><router-link to="/detilkrs" class="dropdown-item">Detail KRS</router-link></li>
+                  <li><router-link class="nav-link" to="/krs">KRS</router-link></li>
+                  <li><router-link class="nav-link" to="/detilkrs">Detil KRS</router-link></li>
                 </ul>
               </li>
-
               <li class="d-flex justify-content-between my-3" style="text-align: left">
                 <button type="button" class="btn btn-outline-danger" style="background-color: red; color: white" @click="logoutUser">Logout</button>
               </li>
@@ -59,7 +58,7 @@
               <td>
                 <div class="btn-group">
                   <router-link :to="{ name: 'EditKrs', params: { id: KRS.id } }" class="btn btn-warning">Edit</router-link>
-                  <router-link :to="{ name: 'AddDetilKrs', params: { id: KRS.id } }" class="btn btn-info">Add Detil KRS</router-link>
+                  <router-link :to="{name: 'AddDetilKrs', params:{id: KRS.id}}" class="btn btn-info">Add Detil KRS</router-link>
                   <router-link :to="{ name: 'DetKrs', params: { id: KRS.id } }" class="btn btn-primary">Detail KRS</router-link>
                   <button type="button" class="btn btn-danger" @click="removeKrs(KRS)">Delete</button>
                 </div>
@@ -96,7 +95,7 @@ export default {
   },
   methods: {
     loadAllKrs() {
-      var url = 'https://api-group7-prognet.manpits.xyz/api/krs';
+      var url = 'http://127.0.0.1:8000/api/krs';
       axios.get(url).then(({ data }) => {
         console.log(data);
         this.allKRS = data;
@@ -116,14 +115,14 @@ export default {
 
       this.allKRS.sort((a, b) => {
         if (a.tahun !== b.tahun) {
-          return a.tahun - b.tahun; // Mengurutkan tahun terlebih dahulua
+          return a.tahun - b.tahun; // Urutkan tahun terlebih dahulu
         } else {
-          return ganjilFirst(a, b); // Mengurutkan mulai dari Ganjil
+          return ganjilFirst(a, b); // Gunakan fungsi penentu urutan ganjil/genap
         }
       });
     },
     removeKrs(KRS) {
-      var url = `https://api-group7-prognet.manpits.xyz/api/krs/${KRS.id}`;
+      var url = `http://127.0.0.1:8000/api/krs/${KRS.id}`;
       axios
         .delete(url)
         .then(() => {

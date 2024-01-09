@@ -23,13 +23,12 @@
                 <router-link class="nav-link" to="/matakuliah">Data Matakuliah</router-link>
               </li>
               <li class="nav-item dropdown">
-                <router-link to="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Data KRS </router-link>
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Data KRS </a>
                 <ul class="dropdown-menu dropdown-menu-dark">
-                  <li><router-link to="/krs" class="dropdown-item">KRS</router-link></li>
-                  <li><router-link to="/detilkrs" class="dropdown-item">Detail KRS</router-link></li>
+                  <li><router-link class="nav-link" to="/krs">KRS</router-link></li>
+                  <li><router-link class="nav-link" to="/detilkrs">Detil KRS</router-link></li>
                 </ul>
               </li>
-
               <li class="d-flex justify-content-between my-3" style="text-align: left">
                 <button type="button" class="btn btn-outline-danger" style="background-color: red; color: white" @click="logoutUser">Logout</button>
               </li>
@@ -44,68 +43,42 @@
         <router-link class="btn btn-primary" to="/tambahmahasiswa">Tambah Data</router-link>
       </div>
       <div class="table-responsive shadow p-3 mb-5 bg-white rounded">
-        <DataTable removableSort class="shadow-sm rounded-lg overflow-clip" v-model:filters="filters" :value="getDataMahasiswa" paginator :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]" tableStyle="min-width: 50rem">
-          <template #header="slotProps">
-            <div class="flex items-center gap-4">
-              <div class="w-full">
-                <label for="default-search" class="mb-2 text-sm font-semibold text-gray-900 sr-only dark:text-white">Search</label>
-                <div class="relative">
-                  <input
-                    v-model="filters['global'].value"
-                    type="text"
-                    id="default-search"
-                    class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="Masukkan kata kunci..."
-                  />
+        <table class="table table-bordered table-striped">
+          <thead class="thead-dark">
+            <tr>
+              <th scope="col">NIM</th>
+              <th scope="col">Nama</th>
+              <th scope="col">Alamat</th>
+              <th scope="col">Tanggal Lahir</th>
+              <th scope="col">Agama</th>
+              <th scope="col">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="Mahasiswa in allMahasiswa" :key="Mahasiswa.id">
+              <td>{{ Mahasiswa.nim }}</td>
+              <td>{{ Mahasiswa.nama }}</td>
+              <td>{{ Mahasiswa.alamat }}</td>
+              <td>{{ Mahasiswa.lahir }}</td>
+              <td>{{ getAgamaName(Mahasiswa.agama_id) }}</td>
+              <td>
+                <div class="btn-group">
+                  <router-link :to="{ name: 'EditMahasiswa', params: { id: Mahasiswa.id } }" class="btn btn-warning">Edit</router-link>
+                  <router-link :to="{ name: 'DetailMahasiswa', params: { id: Mahasiswa.id } }" class="btn btn-info">Detail</router-link>
+                  <button type="button" class="btn btn-danger" @click="removeMahasiswa(Mahasiswa)">Delete</button>
                 </div>
-              </div>
-            </div>
-          </template>
-          <template #loading>
-            <span class="dark:text-gray-300 font-bold"> Loading data, please wait. </span>
-          </template>
-
-          <Column field="nim" sortable header="NIM"></Column>
-          <Column field="nama" sortable header="Nama Lengkap"></Column>
-          <Column field="alamat" sortable header="Alamat"></Column>
-          <Column field="lahir" sortable header="Tanggal Lahir"></Column>
-          <Column field="agama" sortable header="Agama"> </Column>
-
-          <Column header="Action">
-            <template #body="slotProps">
-              <div class="btn-group">
-                <router-link
-                  :to="{
-                    name: 'EditMahasiswa',
-                    params: { id: slotProps.data.id },
-                  }"
-                  class="btn btn-warning"
-                  >Edit</router-link
-                >
-                <router-link
-                  :to="{
-                    name: 'DetailMahasiswa',
-                    params: { id: slotProps.data.id },
-                  }"
-                  class="btn btn-info"
-                  >Detail</router-link
-                >
-                <button type="button" class="btn btn-danger" @click="removeMahasiswa(slotProps.data)">Delete</button>
-              </div>
-            </template>
-          </Column>
-        </DataTable>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import EditMahasiswa from '../components/EditMahasiswa.vue';
+import EditMahasiswa from './EditMahasiswa.vue';
 import axios from 'redaxios';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import { FilterMatchMode } from 'primevue/api';
 
 export default {
   name: 'Mahasiswa',
@@ -121,28 +94,13 @@ export default {
         lahir: '',
         agama_id: '',
       },
-      filters: { global: { value: null, matchMode: FilterMatchMode.CONTAINS } },
-      isLoading: true,
     };
   },
   created() {
     this.loadAllMahasiswa();
     this.loadAgamaList();
   },
-  computed: {
-    getDataMahasiswa() {
-      const data = this.allMahasiswa;
-      data.forEach((item) => {
-        item.agama = this.getAgamaName(item.agama_id);
-      });
-      this.isLoading = false;
-      return data;
-    },
-  },
   methods: {
-    isValidIndex(index) {
-      return Number.isInteger(index) && index >= 0;
-    },
     loadAllMahasiswa() {
       var url = 'https://api-group7-prognet.manpits.xyz/api/mahasiswa';
       axios.get(url).then(({ data }) => {
@@ -153,10 +111,7 @@ export default {
     sortMahasiswa() {
       // Fungsi untuk menyortir array mahasiswa berdasarkan NIM
       this.allMahasiswa.sort((a, b) => {
-        return a.nim.localeCompare(b.nim, undefined, {
-          numeric: true,
-          sensitivity: 'base',
-        });
+        return a.nim.localeCompare(b.nim, undefined, { numeric: true, sensitivity: 'base' });
       });
     },
     loadAgamaList() {
@@ -169,8 +124,8 @@ export default {
       const agama = this.agamaList.find((agama) => agama.id === agama_id);
       return agama ? agama.agama : 'Tidak Diketahui';
     },
-    removeMahasiswa(mahasiswa) {
-      var url = `https://api-group7-prognet.manpits.xyz/api/mahasiswa/${mahasiswa.id}`;
+    removeMahasiswa(Mahasiswa) {
+      var url = `https://api-group7-prognet.manpits.xyz/api/mahasiswa/${Mahasiswa.id}`;
       axios
         .delete(url)
         .then(() => {
@@ -182,10 +137,7 @@ export default {
         });
     },
     editMahasiswa(Mahasiswa) {
-      this.$router.push({
-        name: 'EditMahasiswa',
-        params: { id: Mahasiswa.id },
-      });
+      this.$router.push({ name: 'EditMahasiswa', params: { id: Mahasiswa.id } });
     },
     logoutUser() {
       localStorage.removeItem('user');
@@ -195,8 +147,6 @@ export default {
   },
   components: {
     EditMahasiswa,
-    DataTable,
-    Column,
   },
 };
 </script>

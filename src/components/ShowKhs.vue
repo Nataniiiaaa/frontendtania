@@ -38,10 +38,18 @@
       </div>
     </nav>
 
-    <main class="container mt-4 card shadow p-3 mb-5 bg-light rounded overflow-y: auto;">
+    <main class="container mt-4 card shadow p-3 mb-5 bg-light rounded">
       <div class="mb-4">
-        <h2 class="text-center text mb-3">Informasi Mahasiswa</h2>
+        <h2 class="text-center text mb-3">Kartu Hasil Studi Mahasiswa</h2>
         <table class="table table-bordered">
+          <tr>
+            <th>Tahun</th>
+            <td>{{ KRS.tahun }}</td>
+          </tr>
+          <tr>
+            <th>Semester</th>
+            <td>{{ KRS.semester }}</td>
+          </tr>
           <tr>
             <th style="width: 150px">NIM</th>
             <td>{{ Mahasiswa.nim }}</td>
@@ -51,54 +59,43 @@
             <td>{{ Mahasiswa.nama }}</td>
           </tr>
           <tr>
-            <th>Alamat</th>
-            <td>{{ Mahasiswa.alamat }}</td>
-          </tr>
-          <tr>
-            <th>Tanggal Lahir</th>
-            <td>{{ Mahasiswa.lahir }}</td>
-          </tr>
-          <tr>
-            <th>Agama</th>
-            <td>{{ getAgamaName(Mahasiswa.agama_id) }}</td>
-          </tr>
-          <tr>
             <th>Jumlah SKS</th>
-            <td>{{ this.SKS }}</td>
+            <td>
+              {{ totalSKS }}
+            </td>
           </tr>
           <tr>
-            <th>IP Kumulatif</th>
-            <td>{{ hitungIPK() }}</td>
+            <th>IP Semester</th>
+            <td>{{ hitungIps() }}</td>
           </tr>
         </table>
       </div>
-      <div class="container rounded">
-        <div class="mb-4">
-          <h2 class="text-center text mb-4">Kartu Hasil Studi Mahasiswa</h2>
-          <div class="mt-4">
-            <router-link to="/datamahasiswa" class="btn btn-danger">Kembali</router-link>
-          </div>
-          <table class="table table-bordered table-striped">
-            <thead class="thead-dark">
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Tahun</th>
-                <th scope="col">Semester</th>
-                <th scope="col">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(krs, index) in KrsData" :key="krs.id">
-                <td scope="col">{{ index + 1 }}</td>
-                <td scope="col">{{ krs.tahun }}</td>
-                <td scope="col">{{ krs.semester }}</td>
-                <div class="btn-group">
-                  <router-link :to="{ name: 'ShowKhs', params: { id: krs.id, mhsid: MahasiswaId } }" class="btn btn-info">Show Mahasiswa KHS</router-link>
-                </div>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <div class="table-responsive shadow p-3 mb-5 bg-white rounded">
+        <table class="table table-bordered table-striped">
+          <thead class="thead-dark">
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Kode Matakuliah</th>
+              <th scope="col">Nama Matakuliah</th>
+              <th scope="col">SKS</th>
+              <th scope="col">Predikat</th>
+              <th scope="col">Nilai Akhir</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(matkul, index) in MatakuliahData" :key="matkul.id">
+              <td scope="col">{{ index + 1 }}</td>
+              <td scope="col">{{ matkul.kode }}</td>
+              <td scope="col">{{ matkul.namamatakuliah }}</td>
+              <td scope="col">{{ matkul.sks }}</td>
+              <td scope="col">{{ getPredikat(NilaiMatkul[index]) }}</td>
+              <td scope="col">{{ NilaiMatkul[index] }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="mt-4">
+        <router-link :to="{ name: 'DetailMahasiswa', params: { id: MahasiswaId } }" class="btn btn-danger">Back</router-link>
       </div>
     </main>
   </div>
@@ -108,11 +105,11 @@
 import axios from 'redaxios';
 
 export default {
-  name: 'ShowMahasiswaView',
+  name: 'ShowKhs',
   data() {
     return {
-      MahasiswaId: this.$route.params.id,
-      agamaList: [],
+      MahasiswaId: this.$route.params.mhsid,
+      KrsId: this.$route.params.id,
       Mahasiswa: {
         id: '',
         nim: '',
@@ -121,32 +118,29 @@ export default {
         lahir: '',
         agama_id: '',
       },
-      MatkulData: [],
+      KRS: {
+        id: '',
+        tahun: '',
+        semester: '',
+      },
+      MatakuliahId: [],
+      MatakuliahData: [],
+      MatakuliahSKS: [],
       DetilKrs: [],
-      KrsList: [],
-      KrsData: [],
-      MatkulID: [],
       NilaiMatkul: [],
       SKS: 0,
-      MatkulSKS: [],
-      TotalNilai: 0,
-      IPK: 0,
     };
   },
   created() {
     this.fetchMahasiswaData();
-    this.loadAgamaList();
+    this.fetchKrsData();
     this.loadDetilKrs();
   },
   mounted() {},
   computed: {
-    isMahasiswaHasMatakuliah() {
-      return this.getMatakuliah(this.MahasiswaId).length > 0;
+    totalSKS() {
+      return this.MatakuliahSKS.reduce((sum, sks) => sum + parseFloat(sks), 0);
     },
-    // totalSKS() {
-    //   let sks = this.MatkulData.reduce((sum, matkul) => sum + parseFloat(matkul.sks), 0)
-    //   return sks
-    // },
   },
   methods: {
     fetchMahasiswaData() {
@@ -156,11 +150,10 @@ export default {
         this.Mahasiswa = data;
       });
     },
-    loadAgamaList() {
-      var agamaUrl = 'https://api-group7-prognet.manpits.xyz/api/agama';
-      axios.get(agamaUrl).then(({ data }) => {
-        console.log(data);
-        this.agamaList = data;
+    fetchKrsData() {
+      var url = `https://api-group7-prognet.manpits.xyz/api/krs/${this.KrsId}`;
+      axios.get(url).then(({ data }) => {
+        this.KRS = data;
       });
     },
     loadDetilKrs() {
@@ -168,50 +161,44 @@ export default {
       axios.get(detilKrsUrl).then(({ data }) => {
         console.log(data);
         this.DetilKrs = data;
-        this.fetchKrsFromDetilKrs();
+        this.fetchMatakuliahFromDetilKrs();
       });
     },
-    fetchKrsFromDetilKrs() {
-      const uniqueKrsSet = new Set(); // Use a Set to track unique values
-      const uniqueMatakuliahSet = new Set();
+    fetchMatakuliahFromDetilKrs() {
+      const uniqueMatkul = new Set(); // Use a Set to track unique values
       this.DetilKrs.forEach((detil) => {
-        if (detil.mahasiswa_id == this.MahasiswaId) {
-          uniqueKrsSet.add(detil.krs_id); // Add value to the Set
-          uniqueMatakuliahSet.add(detil.matakuliah_id);
+        if (detil.mahasiswa_id == this.MahasiswaId && detil.krs_id == this.KrsId) {
+          uniqueMatkul.add(detil.matakuliah_id); // Add value to the Set
           this.NilaiMatkul.push(detil.nilai);
         }
       });
-      this.KrsList = Array.from(uniqueKrsSet); // Convert the Set back to an array
-      this.MatkulID = Array.from(uniqueMatakuliahSet);
-      this.loadKrsList();
+      this.MatakuliahId = Array.from(uniqueMatkul); // Convert the Set back to an array
       this.loadMatakuliahList();
-    },
-    loadKrsList() {
-      this.KrsList.forEach((krsid) => {
-        var krsUrl = `https://api-group7-prognet.manpits.xyz/api/krs/${krsid}`;
-        axios.get(krsUrl).then(({ data }) => {
-          this.KrsData.push(data);
-        });
-      });
     },
     loadMatakuliahList() {
       var url = `https://api-group7-prognet.manpits.xyz/api/matakuliah`;
       axios.get(url).then(({ data }) => {
-        this.MatkulData = data;
-        let index = 0;
-        this.MatkulData.forEach((item) => {
-          this.MatkulID.forEach((matkul) => {
-            if (item.id == matkul) {
-              this.MatkulSKS.push(item.sks);
-              this.SKS += parseFloat(item.sks);
-            }
-          });
+        this.MatakuliahData = data;
+        this.MatakuliahData = this.MatakuliahData.filter((item) => {
+          if (this.MatakuliahId.includes(item.id)) {
+            this.MatakuliahSKS.push(item.sks);
+            this.SKS += parseFloat(item.sks);
+            return true;
+          } else {
+            return false;
+          }
         });
       });
     },
-    getAgamaName(agamaId) {
-      const agama = this.agamaList.find((agama) => agama.id === agamaId);
-      return agama ? agama.agama : 'Unknown';
+    getPredikat(nilai) {
+      if (nilai > 0 && nilai < 45) return 'E';
+      else if (nilai >= 45 && nilai < 50) return 'D';
+      else if (nilai >= 50 && nilai < 55) return 'D+';
+      else if (nilai >= 55 && nilai < 60) return 'C';
+      else if (nilai >= 60 && nilai < 65) return 'C+';
+      else if (nilai >= 65 && nilai < 75) return 'B';
+      else if (nilai >= 75 && nilai < 80) return 'B+';
+      else if (nilai >= 80 && nilai <= 100) return 'A';
     },
     getAngka(nilai) {
       if (nilai > 0 && nilai < 45) return 0;
@@ -223,22 +210,22 @@ export default {
       else if (nilai >= 75 && nilai < 80) return 3.5;
       else if (nilai >= 80 && nilai <= 100) return 4;
     },
-
-    hitungIPK() {
+    hitungIps() {
+      this.MatakuliahSKS.forEach((sks, index) => {
+        console.log(index, sks);
+      });
       if (this.SKS > 0) {
         let sum = 0;
         for (let index = 0; index < this.NilaiMatkul.length; index++) {
-          sum += this.getAngka(this.NilaiMatkul[index]) * this.MatkulSKS[index];
+          sum += this.getAngka(this.NilaiMatkul[index]) * this.MatakuliahSKS[index];
         }
-
-        let ipk = sum / this.SKS;
-        ipk = ipk.toFixed(2);
-        return ipk;
+        let ips = sum / this.totalSKS;
+        ips = ips.toFixed(2);
+        return ips;
       } else {
         return 'Load';
       }
     },
-
     logoutUser() {
       localStorage.removeItem('user');
       window.alert('Anda telah logout');
