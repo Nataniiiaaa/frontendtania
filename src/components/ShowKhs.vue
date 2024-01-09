@@ -38,7 +38,7 @@
       </div>
     </nav>
 
-    <main class="container mt-4 card shadow p-3 mb-5 bg-light rounded">
+    <main class="container mt-4 card shadow p-3 mb-5 bg-light rounded overflow-y: auto;">
       <div class="mb-4">
         <h2 class="text-center text mb-3">Kartu Hasil Studi Mahasiswa</h2>
         <table class="table table-bordered">
