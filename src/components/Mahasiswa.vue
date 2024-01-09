@@ -46,6 +46,7 @@
         <table class="table table-bordered table-striped">
           <thead class="thead-dark">
             <tr>
+              <th scope="col">#</th>
               <th scope="col">NIM</th>
               <th scope="col">Nama</th>
               <th scope="col">Alamat</th>
@@ -55,7 +56,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="Mahasiswa in allMahasiswa" :key="Mahasiswa.id">
+            <tr v-for="(Mahasiswa, index ) in allMahasiswa" :key="Mahasiswa.id">
+              <td>{{ index + 1 }}</td>
               <td>{{ Mahasiswa.nim }}</td>
               <td>{{ Mahasiswa.nama }}</td>
               <td>{{ Mahasiswa.alamat }}</td>

@@ -46,6 +46,7 @@
         <table class="table table-bordered table-striped">
           <thead class="thead-dark">
             <tr>
+              <th scope="col">#</th>
               <th scope="col">Kode</th>
               <th scope="col">Nama Matakuliah</th>
               <th scope="col">SKS</th>
@@ -54,7 +55,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="Matakuliah in allMatakuliah" :key="Matakuliah.id">
+            <tr v-for="(Matakuliah, index) in allMatakuliah" :key="Matakuliah.id">
+              <td>{{ index + 1 }}</td>
               <td>{{ Matakuliah.kode }}</td>
               <td>{{ Matakuliah.namamatakuliah }}</td>
               <td>{{ Matakuliah.sks }}</td>
